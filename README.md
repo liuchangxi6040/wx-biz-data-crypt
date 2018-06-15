@@ -1,13 +1,13 @@
-#Golang WXBizDataCrypt
+#Golang WeChat applet data decryption
 
-微信小程序用户信息解密Golang 版
+微信小程序数据解密解密Golang 版
 ```
-go get github.com/yilee/wx-biz-data-crypt
+go get github.com/liuchangxi/wx-data-crypt
 ```
 
 ```go
 import (
-    "github.com/yilee/wx-biz-data-crypt"
+    "github.com/yilee/wx-data-crypt"
 )
 ```
 

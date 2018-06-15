@@ -4,32 +4,14 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 )
 
 var (
-	ErrAppIDNotMatch       = errors.New("app id not match")
 	ErrInvalidBlockSize    = errors.New("invalid block size")
 	ErrInvalidPKCS7Data    = errors.New("invalid PKCS7 data")
 	ErrInvalidPKCS7Padding = errors.New("invalid padding on input")
 )
-
-type UserInfo struct {
-	OpenID    string `json:"openId"`
-	UnionID   string `json:"unionId"`
-	NickName  string `json:"nickName"`
-	Gender    int    `json:"gender"`
-	City      string `json:"city"`
-	Province  string `json:"province"`
-	Country   string `json:"country"`
-	AvatarURL string `json:"avatarUrl"`
-	Language  string `json:"language"`
-	Watermark struct {
-		Timestamp int64  `json:"timestamp"`
-		AppID     string `json:"appid"`
-	} `json:"watermark"`
-}
 
 type WXBizDataCrypt struct {
 	appID, sessionKey string
@@ -63,7 +45,7 @@ func pkcs7Unpad(data []byte, blockSize int) ([]byte, error) {
 	return data[:len(data)-n], nil
 }
 
-func (w *WXBizDataCrypt) Decrypt(encryptedData, iv string) (*UserInfo, error) {
+func (w *WXBizDataCrypt) Decrypt(encryptedData, iv string) ([]byte, error) {
 	aesKey, err := base64.StdEncoding.DecodeString(w.sessionKey)
 	if err != nil {
 		return nil, err
@@ -86,13 +68,6 @@ func (w *WXBizDataCrypt) Decrypt(encryptedData, iv string) (*UserInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var userInfo UserInfo
-	err = json.Unmarshal(cipherText, &userInfo)
-	if err != nil {
-		return nil, err
-	}
-	if userInfo.Watermark.AppID != w.appID {
-		return nil, ErrAppIDNotMatch
-	}
-	return &userInfo, nil
+
+	return cipherText, nil
 }
